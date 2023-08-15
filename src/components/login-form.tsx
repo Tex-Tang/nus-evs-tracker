@@ -29,9 +29,8 @@ export function LoginForm() {
       router.push("/meter/" + json.data.id);
     } else {
       setError(true);
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   const [meterId, setMeterId] = useState<string | null>(null);
@@ -52,12 +51,13 @@ export function LoginForm() {
         </div>
       )}
       <form className="flex gap-2" onSubmit={onSubmit}>
-        <Input type="text" name="username" placeholder="Username" />
-        <Input type="text" name="password" placeholder="Password" />
-        <Button type="submit">Login</Button>
-
-        {error && <p className="text-red-500">Invalid username or password</p>}
+        <Input type="text" name="username" placeholder="Username" disabled={loading} />
+        <Input type="text" name="password" placeholder="Password" disabled={loading} />
+        <Button type="submit" disabled={loading}>
+          {loading ? "Loading..." : "Login"}
+        </Button>
       </form>
+      {error && <p className="text-red-500">Invalid username or password</p>}
     </>
   );
 }
