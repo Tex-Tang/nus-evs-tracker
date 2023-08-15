@@ -28,13 +28,13 @@ export async function POST(request: Request) {
 
     const meterCredit = await getMeterCredit(cookie);
 
-    const latestMeterCredit = await prisma.meterCredit.findFirst({
+    let latestMeterCredit = await prisma.meterCredit.findFirst({
       orderBy: { createdAt: "desc" },
       where: { meterId: meter.id },
     });
 
     if (!latestMeterCredit || latestMeterCredit.recordedAt < meterCredit.lastRecordedTimestamp) {
-      await prisma.meterCredit.create({
+      latestMeterCredit = await prisma.meterCredit.create({
         data: {
           meterId: meter.id,
           credit: meterCredit.lastRecordedCredit,
@@ -44,21 +44,14 @@ export async function POST(request: Request) {
     }
 
     const latestTransaction = await getLatestTransaction(cookie);
-    if (latestTransaction) {
-      const meterCredit = await prisma.meterCredit.findFirst({
-        orderBy: { createdAt: "desc" },
-        where: { meterId: meter.id, recordedAt: { lt: latestTransaction.timestamp } },
+    if (latestTransaction && latestTransaction.timestamp > latestMeterCredit.recordedAt) {
+      await prisma.meterCredit.create({
+        data: {
+          meterId: meter.id,
+          credit: latestMeterCredit.credit + latestTransaction.amount,
+          recordedAt: latestTransaction.timestamp,
+        },
       });
-
-      if (meterCredit) {
-        await prisma.meterCredit.create({
-          data: {
-            meterId: meter.id,
-            credit: meterCredit.credit + latestTransaction.amount,
-            recordedAt: latestTransaction.timestamp,
-          },
-        });
-      }
     }
 
     return NextResponse.json(meterCredit);
