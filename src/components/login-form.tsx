@@ -2,8 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function LoginForm() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export function LoginForm() {
 
     if (res.status === 200) {
       const json = await res.json();
-      console.log(json);
+      localStorage.setItem("meter-id", json.data.id);
       router.push("/meter/" + json.data.id);
     } else {
       setError(true);
@@ -33,13 +34,30 @@ export function LoginForm() {
     setLoading(false);
   }
 
-  return (
-    <form className="flex gap-2" onSubmit={onSubmit}>
-      <Input type="text" name="username" placeholder="Username" />
-      <Input type="text" name="password" placeholder="Password" />
-      <Button type="submit">Login</Button>
+  const [meterId, setMeterId] = useState<string | null>(null);
+  useEffect(() => {
+    if (localStorage.getItem("meter-id")) {
+      setMeterId(localStorage.getItem("meter-id"));
+    }
+  }, []);
 
-      {error && <p className="text-red-500">Invalid username or password</p>}
-    </form>
+  return (
+    <>
+      {meterId && (
+        <div className="mb-2">
+          <Link className="hover:underline" href={"/meter/" + meterId}>
+            Click here to view meter history
+          </Link>
+          <span className="block mt-2">OR</span>
+        </div>
+      )}
+      <form className="flex gap-2" onSubmit={onSubmit}>
+        <Input type="text" name="username" placeholder="Username" />
+        <Input type="text" name="password" placeholder="Password" />
+        <Button type="submit">Login</Button>
+
+        {error && <p className="text-red-500">Invalid username or password</p>}
+      </form>
+    </>
   );
 }
