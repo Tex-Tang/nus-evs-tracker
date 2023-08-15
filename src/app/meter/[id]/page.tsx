@@ -1,5 +1,7 @@
+import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 type PageProps = {
@@ -28,7 +30,12 @@ export default async function Page({ params: { id } }: PageProps) {
 
   return (
     <div>
-      <h1 className="text-2xl mb-4">{meter.username}</h1>
+      <div className="flex justify-between">
+        <h1 className="text-2xl mb-4">{meter.username}</h1>
+        <Link href="https://nus-utown.evs.com.sg/">
+          <Button size="sm">Topup</Button>
+        </Link>
+      </div>
       <Table className="border">
         <TableCaption>A list of your recent invoices.</TableCaption>
         <TableHeader>
@@ -43,7 +50,11 @@ export default async function Page({ params: { id } }: PageProps) {
             <TableRow key={credit.id}>
               <TableCell>{credit.recordedAt.toISOString()}</TableCell>
               <TableCell>{credit.type}</TableCell>
-              <TableCell>{credit.credit}</TableCell>
+              <TableCell>
+                {credit.type == "Topup" && "+"}
+                S$
+                {credit.credit.toFixed(2)}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
