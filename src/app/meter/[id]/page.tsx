@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { prisma } from "@/lib/prisma";
+import { formatInTimeZone } from "date-fns-tz";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -48,7 +49,7 @@ export default async function Page({ params: { id } }: PageProps) {
         <TableBody>
           {meterCredit.map((credit) => (
             <TableRow key={credit.id}>
-              <TableCell>{credit.recordedAt.toISOString()}</TableCell>
+              <TableCell>{formatInTimeZone(credit.recordedAt, "Asia/Singapore", "dd MMM yyyy hh:mm:ss aa")}</TableCell>
               <TableCell>{credit.type}</TableCell>
               <TableCell>
                 {credit.type == "Topup" && "+"}
