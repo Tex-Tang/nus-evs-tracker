@@ -1,13 +1,10 @@
+import Brand from "@/components/brand";
 import { LoginForm } from "@/components/login-form";
-import Link from "next/link";
 
 export default function Home() {
   return (
     <main className="max-w-2xl mx-auto my-8">
-      <h1 className="mb-4">
-        NUS EVS Tracker by
-        <Link href="https://rellort.dev">rellort.dev</Link>
-      </h1>
+      <Brand />
       <LoginForm />
       <div className="flex flex-col gap-4">
         <p className="mt-4">
