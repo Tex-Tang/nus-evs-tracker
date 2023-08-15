@@ -1,0 +1,27 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Meter {
+  id          String        @id @default(uuid())
+  username    String        @unique
+  password    String
+  createdAt   DateTime      @default(now())
+  MeterCredit MeterCredit[]
+}
+
+model MeterCredit {
+  id         String   @id @default(uuid())
+  credit     Float
+  recordedAt DateTime
+  createdAt  DateTime @default(now())
+
+  meterId String
+  meter   Meter  @relation(fields: [meterId], references: [id])
+}
