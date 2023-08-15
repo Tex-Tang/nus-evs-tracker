@@ -7,7 +7,7 @@ export default function Home() {
       <LoginForm />
 
       <p className="mt-4">
-        Login with your NUS EVS credential to view your EVS credit. Your credit will be updated every 4 hours and you
+        Login with your NUS EVS credential to view your EVS credit. Your credit will be updated every 2 hours and you
         may track your EVS credit history.
       </p>
 
