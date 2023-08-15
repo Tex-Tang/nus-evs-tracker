@@ -34,6 +34,7 @@ export default async function Page({ params: { id } }: PageProps) {
         <TableHeader>
           <TableRow>
             <TableHead>Timestamp</TableHead>
+            <TableHead>Type</TableHead>
             <TableHead>Credit</TableHead>
           </TableRow>
         </TableHeader>
@@ -41,6 +42,7 @@ export default async function Page({ params: { id } }: PageProps) {
           {meterCredit.map((credit) => (
             <TableRow key={credit.id}>
               <TableCell>{credit.recordedAt.toISOString()}</TableCell>
+              <TableCell>{credit.type}</TableCell>
               <TableCell>{credit.credit}</TableCell>
             </TableRow>
           ))}

@@ -18,6 +18,7 @@ model Meter {
 
 model MeterCredit {
   id         String   @id @default(uuid())
+  type       String
   credit     Float
   recordedAt DateTime
   createdAt  DateTime @default(now())

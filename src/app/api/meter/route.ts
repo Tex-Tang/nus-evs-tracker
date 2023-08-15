@@ -1,4 +1,4 @@
-import { getCookie, meterSchema } from "@/lib/evs";
+import { getCookie, getMeterCredit, meterSchema } from "@/lib/evs";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -18,6 +18,17 @@ export async function POST(request: Request) {
 
       meter = await prisma.meter.create({
         data: { username: body.username, password: body.password },
+      });
+
+      const meterCredit = await getMeterCredit(cookie);
+
+      await prisma.meterCredit.create({
+        data: {
+          type: "Credit Update",
+          meterId: meter.id,
+          credit: meterCredit.lastRecordedCredit,
+          recordedAt: meterCredit.lastRecordedTimestamp,
+        },
       });
     }
 

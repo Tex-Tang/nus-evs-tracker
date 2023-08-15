@@ -29,7 +29,7 @@ export async function getCookie(meter: Meter) {
   return cookie;
 }
 
-export async function getLatestTransaction(cookie: string) {
+export async function listLatestTransactions(cookie: string) {
   const res = await fetch("https://nus-utown.evs.com.sg/EVSEntApp-war/listTransactionServlet", {
     headers: {
       cookie,
@@ -43,16 +43,19 @@ export async function getLatestTransaction(cookie: string) {
   const body = await res.text();
 
   const document = new JSDOM(body).window.document;
-  const firstRowEl = document.querySelector(
-    "body > table > tbody > tr > td:nth-child(2) > table > tbody > tr:nth-child(4) > td > table > tbody > tr:nth-child(2)"
-  );
+  const rows = Array.from(document.querySelectorAll("table.mainContent table > tbody > tr.tblRow"));
 
-  if (!firstRowEl) return null;
+  if (!rows) return null;
 
-  return {
-    timestamp: parse(firstRowEl.children[1].textContent ?? "", "dd/MM/yyyy HH:mm", new Date()),
-    amount: Number(firstRowEl.children[2].textContent?.trim() ?? 0),
-  };
+  const data = [];
+  for (const row of rows) {
+    data.push({
+      timestamp: parse(row.children[1].textContent ?? "", "dd/MM/yyyy HH:mm", new Date()),
+      amount: Number(row.children[2].textContent?.trim() ?? 0),
+    });
+  }
+
+  return data;
 }
 
 export async function getMeterCredit(cookie: string) {

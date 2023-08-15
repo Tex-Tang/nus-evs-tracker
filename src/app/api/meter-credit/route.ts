@@ -1,4 +1,4 @@
-import { getCookie, getLatestTransaction, getMeterCredit } from "@/lib/evs";
+import { getCookie, getMeterCredit, listLatestTransactions } from "@/lib/evs";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -36,6 +36,7 @@ export async function POST(request: Request) {
     if (!latestMeterCredit || latestMeterCredit.recordedAt < meterCredit.lastRecordedTimestamp) {
       latestMeterCredit = await prisma.meterCredit.create({
         data: {
+          type: "Credit Update",
           meterId: meter.id,
           credit: meterCredit.lastRecordedCredit,
           recordedAt: meterCredit.lastRecordedTimestamp,
@@ -43,13 +44,17 @@ export async function POST(request: Request) {
       });
     }
 
-    const latestTransaction = await getLatestTransaction(cookie);
-    if (latestTransaction && latestTransaction.timestamp > latestMeterCredit.recordedAt) {
+    const latestTransactions = await listLatestTransactions(cookie).then((transactions) =>
+      transactions?.filter((transaction) => transaction.timestamp > latestMeterCredit!.recordedAt)
+    );
+
+    for (const transaction of latestTransactions || []) {
       await prisma.meterCredit.create({
         data: {
+          type: "Topup",
           meterId: meter.id,
-          credit: latestMeterCredit.credit + latestTransaction.amount,
-          recordedAt: latestTransaction.timestamp,
+          credit: transaction.amount,
+          recordedAt: transaction.timestamp,
         },
       });
     }
