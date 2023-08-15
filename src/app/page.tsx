@@ -14,7 +14,8 @@ export default function Home() {
       <p className="mt-4">
         Disclaimer: This is a personal project and is not affiliated with NUS, NUS EVS, or any other. Your NUS EVS
         credential will be stored in our database. We will not use it for any other purpose other than update your EVS
-        credit.
+        credit. By clicking login, I consent to share my username and password with the application and the balance
+        history will be used for visualization purpose.
       </p>
     </main>
   );
