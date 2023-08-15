@@ -1,4 +1,5 @@
 import { parse } from "date-fns";
+import { zonedTimeToUtc } from "date-fns-tz";
 import { JSDOM } from "jsdom";
 import zod from "zod";
 
@@ -11,6 +12,11 @@ export const meterSchema = zod.object({
 });
 
 export type Meter = Zod.infer<typeof meterSchema>;
+
+function parseWithSingaporeTimezone(dateStr: string) {
+  const parsedDate = parse(dateStr, "dd/MM/yyyy HH:mm", new Date());
+  return zonedTimeToUtc(parsedDate, "Asia/Singapore");
+}
 
 export async function getCookie(meter: Meter) {
   const res = await fetch("https://nus-utown.evs.com.sg/EVSEntApp-war/loginServlet", {
@@ -50,7 +56,7 @@ export async function listLatestTransactions(cookie: string) {
   const data = [];
   for (const row of rows) {
     data.push({
-      timestamp: parse(row.children[1].textContent ?? "", "dd/MM/yyyy HH:mm", new Date()),
+      timestamp: parseWithSingaporeTimezone(row.children[1].textContent ?? ""),
       amount: Number(row.children[2].textContent?.trim() ?? 0),
     });
   }
@@ -86,7 +92,7 @@ export async function getMeterCredit(cookie: string) {
     "#frmViewMeterCredit > table > tbody > tr:nth-child(9) > td:nth-child(2) > font"
   );
 
-  const lastRecordedTimestamp = parse(lastRecordedTimestampEl?.textContent ?? "", "dd/MM/yyyy HH:mm:ss", new Date());
+  const lastRecordedTimestamp = parseWithSingaporeTimezone(lastRecordedTimestampEl?.textContent ?? "");
 
   return {
     meterId,
