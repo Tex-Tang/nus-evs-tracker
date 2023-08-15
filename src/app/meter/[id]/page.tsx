@@ -30,7 +30,7 @@ export default async function Page({ params: { id } }: PageProps) {
 
   return (
     <div>
-      <div className="flex justify-between">
+      <div className="flex justify-between items-baseline">
         <h1 className="text-2xl mb-4">{meter.username}</h1>
         <Link href="https://nus-utown.evs.com.sg/">
           <Button size="sm">Topup</Button>
