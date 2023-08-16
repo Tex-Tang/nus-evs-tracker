@@ -53,6 +53,14 @@ export default async function Page({ params: { id } }: PageProps) {
           </Button>
         </form>
       </div>
+      <p className="mb-4">
+        Please note that the meter balance may not be updated immediately after a topup. If you have just topped up,
+        please wait for an hour before checking your balance or check directly at{" "}
+        <Link href="https://nus-utown.evs.com.sg/EVSEntApp-war/listTransactionServlet" className="hover:underline">
+          EVS portal
+        </Link>{" "}
+        directly.
+      </p>
       <Table className="border">
         <TableCaption>A list of your recent invoices.</TableCaption>
         <TableHeader>
