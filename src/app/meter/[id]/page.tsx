@@ -29,6 +29,13 @@ export default async function Page({ params: { id } }: PageProps) {
     },
   });
 
+  for (let i = 0; i < meterCredit.length - 1; i++) {
+    if (meterCredit[i].type == "Topup") {
+      meterCredit[i].type = `Topup (${meterCredit[i].credit.toFixed(2)})`;
+      meterCredit[i].credit += meterCredit[i + 1].credit;
+    }
+  }
+
   return (
     <div>
       <div className="mb-2">
@@ -38,9 +45,13 @@ export default async function Page({ params: { id } }: PageProps) {
       </div>
       <div className="flex justify-between items-baseline">
         <h1 className="text-2xl mb-4">{meter.username}</h1>
-        <Link href="https://nus-utown.evs.com.sg/">
-          <Button size="sm">Topup</Button>
-        </Link>
+        <form method="POST" action="https://nus-utown.evs.com.sg/EVSWebPOS/loginServlet">
+          <input type="hidden" name="txtMtrId" value={meter.username} />
+          <input type="hidden" name="radRetail" value="1" />
+          <Button type="submit" name="btnLogin" value="Submit" size="sm">
+            Topup
+          </Button>
+        </form>
       </div>
       <Table className="border">
         <TableCaption>A list of your recent invoices.</TableCaption>
@@ -56,11 +67,7 @@ export default async function Page({ params: { id } }: PageProps) {
             <TableRow key={credit.id}>
               <TableCell>{formatInTimeZone(credit.recordedAt, "Asia/Singapore", "dd MMM yyyy hh:mm:ss aa")}</TableCell>
               <TableCell>{credit.type}</TableCell>
-              <TableCell>
-                {credit.type == "Topup" && "+"}
-                S$
-                {credit.credit.toFixed(2)}
-              </TableCell>
+              <TableCell>S$ {credit.credit.toFixed(2)}</TableCell>
             </TableRow>
           ))}
         </TableBody>
