@@ -17,20 +17,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Meter not found" }, { status: 404 });
     }
 
-    if (!meter.cookie) {
-      const cookie = await getCookie(meter);
-      if (!cookie) {
-        return NextResponse.json({ error: "Could not get cookie" }, { status: 500 });
-      }
-
-      await prisma.meter.update({ where: { id: meter.id }, data: { cookie } });
-      meter.cookie = cookie;
+    const cookie = await getCookie(meter);
+    if (!cookie) {
+      return NextResponse.json({ error: "Could not get cookie" }, { status: 500 });
     }
 
     // To maximize performance due to vercel timeout (10s)
     const [meterCredit, latestTransactions] = await Promise.all([
-      getMeterCredit(meter.cookie),
-      listLatestTransactions(meter.cookie),
+      getMeterCredit(cookie),
+      listLatestTransactions(cookie),
     ]);
 
     let latestMeterCredit = await prisma.meterCredit.findFirst({

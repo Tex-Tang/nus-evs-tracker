@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       if (!cookie) return NextResponse.error();
 
       meter = await prisma.meter.create({
-        data: { username: body.username, password: body.password, cookie: cookie },
+        data: { username: body.username, password: body.password },
       });
 
       const meterCredit = await getMeterCredit(cookie);
