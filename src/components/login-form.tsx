@@ -40,24 +40,28 @@ export function LoginForm() {
     }
   }, []);
 
+  const [login, setLogin] = useState(false);
+
   return (
-    <>
-      {meterId && (
-        <div className="mb-2">
-          <Link className="hover:underline" href={"/meter/" + meterId}>
-            Click here to view meter history
+    <div className="text-center">
+      {meterId && !login && (
+        <div className="mb-2 flex justify-center gap-4">
+          <Link href={"/meter/" + meterId}>
+            <Button>View your meter</Button>
           </Link>
-          <span className="block mt-2">OR</span>
+          <Button onClick={() => setLogin(true)}>Login Again</Button>
         </div>
       )}
-      <form className="flex gap-2" onSubmit={onSubmit}>
-        <Input type="text" name="username" placeholder="Username" disabled={loading} />
-        <Input type="text" name="password" placeholder="Password" disabled={loading} />
-        <Button type="submit" disabled={loading}>
-          {loading ? "Loading..." : "Login"}
-        </Button>
-      </form>
+      {(!meterId || login) && (
+        <form className="flex sm:flex-row flex-col gap-2" onSubmit={onSubmit}>
+          <Input type="text" name="username" placeholder="Username" disabled={loading} />
+          <Input type="text" name="password" placeholder="Password" disabled={loading} />
+          <Button type="submit" disabled={loading}>
+            {loading ? "Loading..." : "Login"}
+          </Button>
+        </form>
+      )}
       {error && <p className="text-red-500">Invalid username or password</p>}
-    </>
+    </div>
   );
 }
