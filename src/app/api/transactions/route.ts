@@ -1,4 +1,4 @@
-import { getCookie, getMeterCredit } from "@/lib/evs";
+import { getCookie, listLatestTransactions } from "@/lib/evs";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -22,25 +22,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Could not get cookie" }, { status: 500 });
     }
 
-    const meterCredit = await getMeterCredit(cookie);
+    const latestTransactions = await listLatestTransactions(cookie);
 
     let latestMeterCredit = await prisma.meterCredit.findFirst({
       orderBy: { createdAt: "desc" },
       where: { meterId: meter.id },
     });
 
-    if (!latestMeterCredit || latestMeterCredit.recordedAt < meterCredit.lastRecordedTimestamp) {
-      latestMeterCredit = await prisma.meterCredit.create({
-        data: {
-          type: "Credit Update",
-          meterId: meter.id,
-          credit: meterCredit.lastRecordedCredit,
-          recordedAt: meterCredit.lastRecordedTimestamp,
-        },
-      });
-    }
+    const transactionsToUpdate =
+      latestTransactions?.filter((transaction) => transaction.timestamp > latestMeterCredit!.recordedAt) || [];
 
-    return NextResponse.json(meterCredit);
+    await prisma.meterCredit.createMany({
+      data: transactionsToUpdate.map((transaction) => ({
+        type: "Topup",
+        meterId: meter.id,
+        credit: transaction.amount,
+        recordedAt: transaction.timestamp,
+      })),
+    });
+
+    return NextResponse.json(transactionsToUpdate);
   } catch (error: any) {
     if (error instanceof zod.ZodError) {
       return NextResponse.json(error.issues, { status: 400 });
