@@ -12,6 +12,7 @@ model Meter {
   id          String        @id @default(uuid())
   username    String        @unique
   password    String
+  cookie      String        @default("")
   createdAt   DateTime      @default(now())
   MeterCredit MeterCredit[]
 }

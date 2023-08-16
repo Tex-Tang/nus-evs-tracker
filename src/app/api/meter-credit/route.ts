@@ -5,28 +5,33 @@ import { NextResponse } from "next/server";
 import zod from "zod";
 
 const schema = zod.object({
-  username: zod
-    .string()
-    .length(8)
-    .regex(/^[0-9]+$/),
-  password: zod.string().min(6).max(8),
+  id: zod.string().uuid(),
 });
 
 export async function POST(request: Request) {
   try {
     const body = await schema.parseAsync(await request.json());
-    const cookie = await getCookie({ username: body.username, password: body.password });
-    if (!cookie) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
-    }
-
-    const meter = await prisma.meter.findUnique({ where: { username: body.username } });
+    const meter = await prisma.meter.findUnique({ where: { id: body.id } });
 
     if (!meter) {
       return NextResponse.json({ error: "Meter not found" }, { status: 404 });
     }
 
-    const meterCredit = await getMeterCredit(cookie);
+    if (!meter.cookie) {
+      const cookie = await getCookie(meter);
+      if (!cookie) {
+        return NextResponse.json({ error: "Could not get cookie" }, { status: 500 });
+      }
+
+      await prisma.meter.update({ where: { id: meter.id }, data: { cookie } });
+      meter.cookie = cookie;
+    }
+
+    // To maximize performance due to vercel timeout (10s)
+    const [meterCredit, latestTransactions] = await Promise.all([
+      getMeterCredit(meter.cookie),
+      listLatestTransactions(meter.cookie),
+    ]);
 
     let latestMeterCredit = await prisma.meterCredit.findFirst({
       orderBy: { createdAt: "desc" },
@@ -44,20 +49,17 @@ export async function POST(request: Request) {
       });
     }
 
-    const latestTransactions = await listLatestTransactions(cookie).then((transactions) =>
-      transactions?.filter((transaction) => transaction.timestamp > latestMeterCredit!.recordedAt)
-    );
+    const transactionsToUpdate =
+      latestTransactions?.filter((transaction) => transaction.timestamp > latestMeterCredit!.recordedAt) || [];
 
-    for (const transaction of latestTransactions || []) {
-      await prisma.meterCredit.create({
-        data: {
-          type: "Topup",
-          meterId: meter.id,
-          credit: transaction.amount,
-          recordedAt: transaction.timestamp,
-        },
-      });
-    }
+    await prisma.meterCredit.createMany({
+      data: transactionsToUpdate.map((transaction) => ({
+        type: "Topup",
+        meterId: meter.id,
+        credit: transaction.amount,
+        recordedAt: transaction.timestamp,
+      })),
+    });
 
     return NextResponse.json(meterCredit);
   } catch (error: any) {

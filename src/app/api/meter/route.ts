@@ -12,12 +12,10 @@ export async function POST(request: Request) {
     let meter = await prisma.meter.findUnique({ where: { username: body.username } });
     if (!meter) {
       const cookie = await getCookie({ username: body.username, password: body.password });
-      if (!cookie) {
-        return NextResponse.error();
-      }
+      if (!cookie) return NextResponse.error();
 
       meter = await prisma.meter.create({
-        data: { username: body.username, password: body.password },
+        data: { username: body.username, password: body.password, cookie: cookie },
       });
 
       const meterCredit = await getMeterCredit(cookie);
