@@ -31,7 +31,7 @@ export default async function Page({ params: { id } }: PageProps) {
 
   for (let i = 0; i < meterCredit.length - 1; i++) {
     if (meterCredit[i].type == "Topup") {
-      meterCredit[i].type = `Topup (${meterCredit[i].credit.toFixed(2)})`;
+      meterCredit[i].type = `Topup (S$ ${meterCredit[i].credit.toFixed(2)})`;
       meterCredit[i].credit += meterCredit[i + 1].credit;
     }
   }
