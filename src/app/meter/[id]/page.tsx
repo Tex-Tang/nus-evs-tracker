@@ -62,7 +62,7 @@ export default async function Page({ params: { id } }: PageProps) {
         directly.
       </p>
       <Table className="border">
-        <TableCaption>A list of your recent invoices.</TableCaption>
+        <TableCaption>A list of your recent balance history.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Timestamp</TableHead>
