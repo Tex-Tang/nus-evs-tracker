@@ -62,7 +62,7 @@ export default async function Page({ params: { id } }: PageProps) {
       data
         .map((credit) => ({
           ...credit,
-          recordedAt: formatInTimeZone(credit.recordedAt, "Asia/Singapore", "dd MMM yyyy HH:mm:ss"),
+          recordedAt: formatInTimeZone(credit.recordedAt, "Asia/Singapore", "dd MMM yyyy HH:mm:ss aa"),
         }))
         .reverse()
     );
@@ -98,15 +98,21 @@ export default async function Page({ params: { id } }: PageProps) {
         <TableHeader>
           <TableRow>
             <TableHead>Timestamp</TableHead>
-            <TableHead>Type</TableHead>
+            <TableHead className="hidden sm:table-cell">Type</TableHead>
             <TableHead>Credit</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {tableData.map((credit) => (
             <TableRow key={credit.id}>
-              <TableCell>{formatInTimeZone(credit.recordedAt, "Asia/Singapore", "dd MMM yyyy HH:mm:ss")}</TableCell>
-              <TableCell>{credit.type}</TableCell>
+              <TableCell>
+                {formatInTimeZone(credit.recordedAt, "Asia/Singapore", "dd MMM yyyy HH:mm:ss aa")}
+                <span className="sm:hidden">
+                  <br />
+                  {credit.type}
+                </span>
+              </TableCell>
+              <TableCell className="hidden sm:table-cell">{credit.type}</TableCell>
               <TableCell>S$ {credit.credit.toFixed(2)}</TableCell>
             </TableRow>
           ))}
