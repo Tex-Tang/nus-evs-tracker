@@ -1,6 +1,8 @@
+import { MeterBarChart } from "@/components/meter-bar-chart";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { prisma } from "@/lib/prisma";
+import { MeterCredit } from "@prisma/client";
 import { formatInTimeZone } from "date-fns-tz";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -20,21 +22,46 @@ export default async function Page({ params: { id } }: PageProps) {
 
   if (!meter) redirect("/");
 
-  const meterCredit = await prisma.meterCredit.findMany({
-    where: {
-      meter: { id },
-    },
-    orderBy: {
-      recordedAt: "desc",
-    },
-  });
+  const tableData = await prisma.meterCredit
+    .findMany({
+      where: {
+        meter: { id },
+      },
+      orderBy: {
+        recordedAt: "desc",
+      },
+    })
+    .then((data) =>
+      data.reduce<MeterCredit[]>((acc, curr) => {
+        if (curr.type == "Topup") {
+          acc[acc.length - 1].credit += curr.credit;
+        } else {
+          acc.push(curr);
+        }
+        return acc;
+      }, [])
+    );
 
-  for (let i = 0; i < meterCredit.length - 1; i++) {
-    if (meterCredit[i].type == "Topup") {
-      meterCredit[i].type = `Topup (S$ ${meterCredit[i].credit.toFixed(2)})`;
-      meterCredit[i].credit += meterCredit[i + 1].credit;
-    }
-  }
+  const graphData = await prisma.meterCredit
+    .findMany({
+      select: {
+        id: true,
+        type: true,
+        credit: true,
+        recordedAt: true,
+      },
+      where: { meter: { id } },
+      orderBy: { recordedAt: "desc" },
+      take: 20,
+    })
+    .then((data) =>
+      data
+        .map((credit) => ({
+          ...credit,
+          recordedAt: formatInTimeZone(credit.recordedAt, "Asia/Singapore", "dd MMM yyyy HH:mm:ss"),
+        }))
+        .reverse()
+    );
 
   return (
     <div>
@@ -61,6 +88,7 @@ export default async function Page({ params: { id } }: PageProps) {
         </Link>{" "}
         directly.
       </p>
+      <MeterBarChart data={graphData} />
       <Table className="border">
         <TableCaption>A list of your recent balance history.</TableCaption>
         <TableHeader>
@@ -71,9 +99,9 @@ export default async function Page({ params: { id } }: PageProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {meterCredit.map((credit) => (
+          {tableData.map((credit) => (
             <TableRow key={credit.id}>
-              <TableCell>{formatInTimeZone(credit.recordedAt, "Asia/Singapore", "dd MMM yyyy hh:mm:ss aa")}</TableCell>
+              <TableCell>{formatInTimeZone(credit.recordedAt, "Asia/Singapore", "dd MMM yyyy HH:mm:ss")}</TableCell>
               <TableCell>{credit.type}</TableCell>
               <TableCell>S$ {credit.credit.toFixed(2)}</TableCell>
             </TableRow>
