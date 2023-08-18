@@ -32,14 +32,18 @@ export default async function Page({ params: { id } }: PageProps) {
       },
     })
     .then((data) =>
-      data.reduce<MeterCredit[]>((acc, curr) => {
-        if (curr.type == "Topup") {
-          acc[acc.length - 1].credit += curr.credit;
-        } else {
-          acc.push(curr);
-        }
-        return acc;
-      }, [])
+      data
+        .reduceRight<MeterCredit[]>((acc, curr) => {
+          if (curr.type == "Topup") {
+            curr.type = `Topup (S$ ${curr.credit.toFixed(2)})`;
+            curr.credit += acc[acc.length - 1].credit;
+            acc.push(curr);
+          } else {
+            acc.push(curr);
+          }
+          return acc;
+        }, [])
+        .reverse()
     );
 
   const graphData = await prisma.meterCredit
