@@ -54,7 +54,7 @@ export function LoginForm() {
       )}
       {(!meterId || login) && (
         <div>
-          <form className="flex sm:flex-row flex-col gap-2" onSubmit={onSubmit}>
+          <form className="flex sm:flex-row flex-col gap-2" onSubmit={onSubmit} method="POST">
             <Input type="text" name="username" placeholder="Username" disabled={loading} />
             <Input type="text" name="password" placeholder="Password" disabled={loading} />
             <Button type="submit" disabled={loading}>

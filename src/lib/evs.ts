@@ -8,7 +8,7 @@ export const meterSchema = zod.object({
     .string()
     .length(8)
     .regex(/^[0-9]+$/),
-  password: zod.string().min(6).max(8),
+  password: zod.string().min(6).max(10),
 });
 
 export type Meter = Zod.infer<typeof meterSchema>;
