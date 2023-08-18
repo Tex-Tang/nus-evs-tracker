@@ -1,5 +1,7 @@
 import Brand from "@/components/brand";
 import { LoginForm } from "@/components/login-form";
+import { Github } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -29,10 +31,16 @@ export default function Home() {
         <p>
           Disclaimer: This is a personal project and is not affiliated with NUS, NUS EVS, or any other. Your NUS EVS
           credential will be stored in our database. We will not use it for any other purpose other than tracking your
-          EVS credit. By clicking login, I consent to share my username and password with the application and the
-          balance history will be used for visualization purpose.
+          EVS credit.
         </p>
       </div>
+      <footer>
+        <div className="text-center mt-4">
+          <Link className="hover:underline" href="https://github.com/Tex-Tang/nus-evs-tracker">
+            Contribute us on <Github className="inline relative -top-0.5" /> GitHub
+          </Link>
+        </div>
+      </footer>
     </main>
   );
 }

@@ -53,13 +53,19 @@ export function LoginForm() {
         </div>
       )}
       {(!meterId || login) && (
-        <form className="flex sm:flex-row flex-col gap-2" onSubmit={onSubmit}>
-          <Input type="text" name="username" placeholder="Username" disabled={loading} />
-          <Input type="text" name="password" placeholder="Password" disabled={loading} />
-          <Button type="submit" disabled={loading}>
-            {loading ? "Loading..." : "Login"}
-          </Button>
-        </form>
+        <div>
+          <form className="flex sm:flex-row flex-col gap-2" onSubmit={onSubmit}>
+            <Input type="text" name="username" placeholder="Username" disabled={loading} />
+            <Input type="text" name="password" placeholder="Password" disabled={loading} />
+            <Button type="submit" disabled={loading}>
+              {loading ? "Loading..." : "Login"}
+            </Button>
+          </form>
+          <p className="mt-2 text-left">
+            By clicking login, I consent to share my username and password with the application and the balance history
+            will be used for visualization purpose.
+          </p>
+        </div>
       )}
       {error && <p className="text-red-500">Invalid username or password</p>}
     </div>
