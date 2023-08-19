@@ -1,16 +1,19 @@
 import Brand from "@/components/brand";
 import { LoginForm } from "@/components/login-form";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import Image from "next/image";
 import Link from "next/link";
 import { FaGithub } from "react-icons/fa";
 
 export default function Home() {
   return (
-    <main className="max-w-2xl mx-auto">
+    <main className="max-w-2xl mx-auto flex flex-col my-4 gap-y-4 sm:gap-y-8">
       <Brand />
       <LoginForm />
 
-      <Accordion type="single" collapsible className="border-t mt-8">
+      <Image src={"/screenshot.png"} width={800} height={600} alt="Screenshot" className="border" />
+
+      <Accordion type="single" collapsible className="border-t">
         <AccordionItem value="item-1">
           <AccordionTrigger>How it works?</AccordionTrigger>
           <AccordionContent>
@@ -55,14 +58,14 @@ export default function Home() {
         </AccordionItem>
       </Accordion>
 
-      <p className="my-4 text-xs text-gray-600">
+      <p className="text-xs text-gray-600">
         Disclaimer: This is a personal project and is not affiliated with NUS, NUS EVS, or any other. Your NUS EVS
         credential will be stored in our database. We will not use it for any other purpose other than tracking your EVS
         credit.
       </p>
 
       <footer>
-        <div className="text-center mt-4">
+        <div className="text-center">
           <Link className="hover:underline" href="https://github.com/Tex-Tang/nus-evs-tracker">
             Contribute on <FaGithub className="inline relative -top-0.5 text-lg" /> GitHub
           </Link>

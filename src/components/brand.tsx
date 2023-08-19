@@ -4,7 +4,7 @@ export type BrandProps = React.ComponentPropsWithoutRef<"div">;
 
 export default function Brand(props: BrandProps) {
   return (
-    <div {...props} className="text-center mb-8">
+    <div {...props} className="text-center">
       <div className="text-2xl font-medium sm:text-4xl">NUS EVS Tracker</div>
       <div className="mt-1 flex items-center justify-center gap-1 text-base sm:mt-2 sm:text-xl">
         developed by
