@@ -1,4 +1,4 @@
-import { getCookie, getMeterCredit } from "@/lib/evs";
+import { EVSError, getCookie, getMeterCredit } from "@/lib/evs";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -10,10 +10,24 @@ const schema = zod.object({
 
 export async function POST(request: Request) {
   const requestData = await request.json();
+
   try {
     const body = await schema.parseAsync(requestData);
-    const meter = await prisma.meter.findUnique({ where: { id: body.id } });
 
+    const meter = await prisma.meter.findUnique({
+      where: {
+        id: body.id,
+      },
+      select: {
+        id: true,
+        username: true,
+        password: true,
+        MeterCredit: {
+          orderBy: { recordedAt: "desc" },
+          take: 1,
+        },
+      },
+    });
     if (!meter) {
       return NextResponse.json({ error: "Meter not found", data: requestData }, { status: 404 });
     }
@@ -25,44 +39,30 @@ export async function POST(request: Request) {
 
     const meterCredit = await getMeterCredit(cookie);
 
-    let latestMeterCredit = await prisma.meterCredit.findFirst({
-      orderBy: { createdAt: "desc" },
-      where: { meterId: meter.id },
-    });
+    const latestMeterCredit = meter.MeterCredit.length > 0 ? meter.MeterCredit[0] : null;
+
+    const data = {
+      meterId: meter.id,
+      type: "Credit Update",
+      credit: meterCredit.lastRecordedCredit - meterCredit.overusedValue,
+      recordedAt: meterCredit.lastRecordedTimestamp,
+    };
 
     if (!latestMeterCredit || latestMeterCredit.recordedAt < meterCredit.lastRecordedTimestamp) {
-      const data = {
-        type: "Credit Update",
-        meterId: meter.id,
-        credit: meterCredit.lastRecordedCredit - meterCredit.overusedValue,
-        recordedAt: meterCredit.lastRecordedTimestamp,
-      };
+      await prisma.meterCredit.create({ data });
 
-      latestMeterCredit = await prisma.meterCredit.create({ data });
-
-      return NextResponse.json({
-        status: "OK",
-        message: "New meter credit data updated",
-        data,
-      });
+      return NextResponse.json({ message: "New meter credit data updated", data });
     }
 
-    return NextResponse.json({
-      status: "OK",
-      message: "No new meter credit data to update",
-    });
+    return NextResponse.json({ message: "No new meter credit data to update", data });
   } catch (error: any) {
     if (error instanceof zod.ZodError) {
       return NextResponse.json(error.issues, { status: 400 });
+    } else if (error instanceof EVSError) {
+      return NextResponse.json({ error: error.message, data: requestData }, { status: 401 });
     } else {
       console.error(error);
-      return NextResponse.json(
-        {
-          error: "Internal server error",
-          data: requestData,
-        },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Internal server error", data: requestData }, { status: 500 });
     }
   }
 }

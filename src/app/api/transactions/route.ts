@@ -1,4 +1,4 @@
-import { getCookie, listLatestTransactions } from "@/lib/evs";
+import { EVSError, getCookie, listLatestTransactions } from "@/lib/evs";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -9,45 +9,64 @@ const schema = zod.object({
 });
 
 export async function POST(request: Request) {
-  try {
-    const body = await schema.parseAsync(await request.json());
-    const meter = await prisma.meter.findUnique({ where: { id: body.id } });
+  const requestData = await request.json();
 
+  try {
+    const body = await schema.parseAsync(requestData);
+
+    const meter = await prisma.meter.findUnique({
+      where: {
+        id: body.id,
+      },
+      select: {
+        id: true,
+        username: true,
+        password: true,
+        MeterCredit: {
+          orderBy: { recordedAt: "desc" },
+          take: 1,
+        },
+      },
+    });
     if (!meter) {
       return NextResponse.json({ error: "Meter not found" }, { status: 404 });
     }
 
-    const cookie = await getCookie(meter);
-    if (!cookie) {
-      return NextResponse.json({ error: "Could not get cookie" }, { status: 500 });
+    const latestMeterCredit = meter.MeterCredit.length > 0 ? meter.MeterCredit[0] : null;
+    if (!latestMeterCredit) {
+      return NextResponse.json({ status: "OK", message: "No meter credit data found" });
     }
+
+    const cookie = await getCookie(meter);
+    if (!cookie) return NextResponse.json({ error: "Could not get cookie" }, { status: 500 });
 
     const latestTransactions = await listLatestTransactions(cookie);
 
-    let latestMeterCredit = await prisma.meterCredit.findFirst({
-      orderBy: { createdAt: "desc" },
-      where: { meterId: meter.id },
-    });
-
     const transactionsToUpdate =
-      latestTransactions?.filter((transaction) => transaction.timestamp > latestMeterCredit!.recordedAt) || [];
+      latestTransactions?.filter((transaction) => transaction.timestamp > latestMeterCredit.recordedAt) || [];
 
-    await prisma.meterCredit.createMany({
-      data: transactionsToUpdate.map((transaction) => ({
-        type: "Topup",
-        meterId: meter.id,
-        credit: transaction.amount,
-        recordedAt: transaction.timestamp,
-      })),
-    });
+    if (transactionsToUpdate.length === 0) {
+      return NextResponse.json({ message: "No new topup data found", data: latestTransactions });
+    }
 
-    return NextResponse.json(transactionsToUpdate);
+    const data = transactionsToUpdate.map((transaction) => ({
+      type: "Topup",
+      meterId: meter.id,
+      credit: transaction.amount,
+      recordedAt: transaction.timestamp,
+    }));
+
+    await prisma.meterCredit.createMany({ data });
+
+    return NextResponse.json({ message: "New topup data updated", data });
   } catch (error: any) {
     if (error instanceof zod.ZodError) {
       return NextResponse.json(error.issues, { status: 400 });
+    } else if (error instanceof EVSError) {
+      return NextResponse.json({ error: error.message, data: requestData }, { status: 401 });
     } else {
       console.error(error);
-      return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+      return NextResponse.json({ error: "Internal server error", data: requestData }, { status: 500 });
     }
   }
 }
