@@ -1,8 +1,8 @@
 import Brand from "@/components/brand";
 import { LoginForm } from "@/components/login-form";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Github } from "lucide-react";
 import Link from "next/link";
+import { FaGithub } from "react-icons/fa";
 
 export default function Home() {
   return (
@@ -64,7 +64,7 @@ export default function Home() {
       <footer>
         <div className="text-center mt-4">
           <Link className="hover:underline" href="https://github.com/Tex-Tang/nus-evs-tracker">
-            Contribute us on <Github className="inline relative -top-0.5" /> GitHub
+            Contribute on <FaGithub className="inline relative -top-0.5 text-lg" /> GitHub
           </Link>
         </div>
       </footer>
