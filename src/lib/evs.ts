@@ -88,7 +88,11 @@ export async function getMeterCredit(cookie: string) {
   );
   const lastRecordedCredit = Number(lastRecordedCreditEl?.textContent?.replace("S$", "").trim());
 
-  console.log;
+  const overusedEl = document.querySelector(
+    "#frmViewMeterCredit > table > tbody > tr:nth-child(12) > td:nth-child(2) > font"
+  );
+  const overusedValue = Number(overusedEl?.textContent?.replace("$", "").trim());
+
   const lastRecordedTimestampEl = document.querySelector(
     "#frmViewMeterCredit > table > tbody > tr:nth-child(9) > td:nth-child(2) > font"
   );
@@ -100,7 +104,8 @@ export async function getMeterCredit(cookie: string) {
 
   return {
     meterId,
-    lastRecordedCredit,
+    overusedValue: overusedValue ?? 0,
+    lastRecordedCredit: lastRecordedCredit ?? 0,
     lastRecordedTimestamp,
   };
 }
