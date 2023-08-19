@@ -62,8 +62,8 @@ export function LoginForm() {
             </Button>
           </form>
           <p className="mt-2 text-left">
-            By clicking login, I consent to share my username and password with the application and the balance history
-            will be used for visualization purpose.
+            By clicking login, I consent to share my username and password with the system in order to track my evs
+            credit history.
           </p>
         </div>
       )}
