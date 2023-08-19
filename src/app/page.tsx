@@ -14,9 +14,9 @@ export default function Home() {
         <AccordionItem value="item-1">
           <AccordionTrigger>How it works?</AccordionTrigger>
           <AccordionContent>
-            Our system will login to NUS EVS portal using provided credential to retrieve your EVS credit in hourly
+            Our system will login to NUS EVS portal using credential you provided to retrieve your EVS credit in hourly
             manner. Therefore, you may track your EVS credit history{" "}
-            <strong>from the day you login and not before.</strong>
+            <strong>from the day you login but not before.</strong>
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-2">
@@ -27,7 +27,7 @@ export default function Home() {
             proof of following abnormal cases:
             <ul className="list-disc pl-5">
               <li className="font-medium">Phantom/Random deduction when you are not even in your room.</li>
-              <li className="font-medium">Over-priced issue</li>
+              <li className="font-medium">Price spike</li>
             </ul>
           </AccordionContent>
         </AccordionItem>
@@ -35,8 +35,8 @@ export default function Home() {
           <AccordionTrigger>How we will use your username and password?</AccordionTrigger>
           <AccordionContent>
             We will use your username and password to login to NUS EVS portal and retrieve your{" "}
-            <strong>EVS credit and Topup history</strong>. We won't be able to retrieve your personal information or any
-            related information (Room Number etc).
+            <strong>EVS credit and Topup history</strong>. We will not retrieve your personal information or any related
+            information (Room Number etc).
             <br />
             <br />
             However, we cannot guarantee that your credential will be <strong>100% safe with us</strong>. If you are not
