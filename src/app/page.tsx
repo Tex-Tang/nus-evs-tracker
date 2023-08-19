@@ -6,11 +6,11 @@ import { FaGithub } from "react-icons/fa";
 
 export default function Home() {
   return (
-    <main className="max-w-2xl mx-auto my-8">
+    <main className="max-w-2xl mx-auto">
       <Brand />
       <LoginForm />
 
-      <Accordion type="single" collapsible>
+      <Accordion type="single" collapsible className="border-t mt-8">
         <AccordionItem value="item-1">
           <AccordionTrigger>How it works?</AccordionTrigger>
           <AccordionContent>
