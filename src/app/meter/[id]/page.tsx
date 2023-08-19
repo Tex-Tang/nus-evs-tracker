@@ -14,11 +14,7 @@ type PageProps = {
 };
 
 export default async function Page({ params: { id } }: PageProps) {
-  const meter = await prisma.meter.findUnique({
-    where: {
-      id,
-    },
-  });
+  const meter = await prisma.meter.findUnique({ where: { id } });
 
   if (!meter) redirect("/");
 
