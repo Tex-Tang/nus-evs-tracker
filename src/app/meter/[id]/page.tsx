@@ -74,8 +74,8 @@ export default async function Page({ params: { id } }: PageProps) {
           Back
         </Link>
       </div>
-      <div className="flex justify-between items-baseline">
-        <h1 className="text-2xl mb-4">{meter.username}</h1>
+      <div className="flex justify-between items-center mb-2">
+        <h1 className="text-2xl">{meter.username}</h1>
         <form method="POST" action="https://nus-utown.evs.com.sg/EVSWebPOS/loginServlet" target="_blank">
           <input type="hidden" name="txtMtrId" value={meter.username} />
           <input type="hidden" name="radRetail" value="1" />
