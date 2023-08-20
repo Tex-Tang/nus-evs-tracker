@@ -1,6 +1,7 @@
 import Brand from "@/components/brand";
 import { LoginForm } from "@/components/login-form";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import Image from "next/image";
 import Link from "next/link";
 import { FaGithub } from "react-icons/fa";
@@ -9,6 +10,19 @@ export default function Home() {
   return (
     <main className="max-w-2xl mx-auto flex flex-col my-4 gap-y-4 sm:gap-y-8">
       <Brand />
+      <Alert>
+        <AlertDescription>
+          🎉 We have released a{" "}
+          <Link
+            href="https://github.com/Tex-Tang/nus-evs-tracker/releases/tag/v0.1.0"
+            className="hover:underline text-blue-600"
+          >
+            new version (v0.1.0)
+          </Link>{" "}
+          which fixed the issue of not able to retrieve EVS credit.
+        </AlertDescription>
+      </Alert>
+
       <LoginForm />
 
       <Image src={"/screenshot.png"} width={800} height={600} alt="Screenshot" className="border" />
