@@ -39,12 +39,17 @@ export async function POST(request: Request) {
 
     const meterCredit = await getMeterCredit(cookie);
 
+    const latestCredit =
+      meterCredit.totalBalance && meterCredit.overusedValue
+        ? meterCredit.totalBalance - meterCredit.overusedValue
+        : meterCredit.totalBalance;
+
     const latestMeterCredit = meter.MeterCredit.length > 0 ? meter.MeterCredit[0] : null;
 
     const data = {
       meterId: meter.id,
       type: "Credit Update",
-      credit: meterCredit.lastRecordedCredit - meterCredit.overusedValue,
+      credit: latestCredit,
       recordedAt: meterCredit.lastRecordedTimestamp,
     };
 
