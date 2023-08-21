@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { prisma } from "@/lib/prisma";
 import { MeterCredit } from "@prisma/client";
+import { differenceInHours } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -11,6 +12,11 @@ type PageProps = {
   params: {
     id: string;
   };
+};
+
+type MeterCreditWithChange = MeterCredit & {
+  change?: number;
+  lastUpdatedInHours?: number;
 };
 
 export default async function Page({ params: { id } }: PageProps) {
@@ -29,13 +35,17 @@ export default async function Page({ params: { id } }: PageProps) {
     })
     .then((data) =>
       data
-        .reduceRight<MeterCredit[]>((acc, curr) => {
+        .reduceRight<MeterCreditWithChange[]>((acc, curr: MeterCreditWithChange) => {
           if (curr.type == "Topup") {
-            curr.type = `Topup (S$ ${curr.credit.toFixed(2)})`;
             curr.credit += acc[acc.length - 1].credit;
             acc.push(curr);
           } else {
             acc.push(curr);
+          }
+
+          if (acc.length >= 2) {
+            curr.lastUpdatedInHours = differenceInHours(acc[acc.length - 1].recordedAt, acc[acc.length - 2].recordedAt);
+            curr.change = acc[acc.length - 1].credit - acc[acc.length - 2].credit;
           }
           return acc;
         }, [])
@@ -89,27 +99,33 @@ export default async function Page({ params: { id } }: PageProps) {
         directly.
       </p>
       <MeterBarChart data={graphData} />
-      <Table className="border">
+      <Table className="border text-xs sm:text-sm">
         <TableCaption>A list of your recent balance history.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Timestamp</TableHead>
             <TableHead className="hidden sm:table-cell">Type</TableHead>
-            <TableHead>Credit</TableHead>
+            <TableHead className="min-w-[80px]">Change</TableHead>
+            <TableHead className="min-w-[80px]">Credit</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {tableData.map((credit) => (
+          {tableData.map((credit, i) => (
             <TableRow key={credit.id}>
               <TableCell>
-                {formatInTimeZone(credit.recordedAt, "Asia/Singapore", "dd MMM yyyy HH:mm:ss aa")}
+                {formatInTimeZone(credit.recordedAt, "Asia/Singapore", "dd MMM yyyy HH:mm aa")}
                 <span className="sm:hidden">
                   <br />
                   {credit.type}
                 </span>
               </TableCell>
               <TableCell className="hidden sm:table-cell">{credit.type}</TableCell>
-              <TableCell>S$ {credit.credit.toFixed(2)}</TableCell>
+              <TableCell className="font-mono">
+                {typeof credit.change == "number"
+                  ? (credit.change >= 0 ? "+S$ " : "-S$ ") + Math.abs(credit.change).toFixed(2)
+                  : ""}
+              </TableCell>
+              <TableCell className="font-mono">S$ {credit.credit.toFixed(2)}</TableCell>
             </TableRow>
           ))}
         </TableBody>
