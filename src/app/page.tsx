@@ -20,7 +20,14 @@ export default function Home() {
             new version (v0.1.0)
           </Link>{" "}
           which fixed the issue of not able to retrieve EVS credit for special case such as <strong>overused</strong>{" "}
-          and multiple packages.
+          and multiple packages. (review us on{" "}
+          <Link
+            href="https://www.reddit.com/r/nus/comments/15ubrla/track_your_aircon_usage/?utm_source=share&utm_medium=web2x&context=3"
+            className="hover:underline text-blue-600"
+          >
+            Reddit
+          </Link>{" "}
+          now!)
         </AlertDescription>
       </Alert>
 
