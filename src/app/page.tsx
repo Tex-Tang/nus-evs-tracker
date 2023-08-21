@@ -19,7 +19,8 @@ export default function Home() {
           >
             new version (v0.1.0)
           </Link>{" "}
-          which fixed the issue of not able to retrieve EVS credit.
+          which fixed the issue of not able to retrieve EVS credit for special case such as <strong>overused</strong>{" "}
+          and multiple packages.
         </AlertDescription>
       </Alert>
 
