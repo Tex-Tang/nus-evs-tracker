@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     const meterCredit = await getMeterCredit(cookie);
 
     const latestCredit =
-      meterCredit.totalBalance && meterCredit.overusedValue
+      typeof meterCredit.totalBalance === "number" && typeof meterCredit.overusedValue === "number"
         ? meterCredit.totalBalance - meterCredit.overusedValue
         : meterCredit.totalBalance;
 
