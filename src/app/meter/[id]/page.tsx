@@ -1,8 +1,10 @@
-import { MeterBarChart } from "@/components/meter-bar-chart";
+import { AverageDailyCostChart } from "@/components/meter/average-daily-cost-chart";
+import { CreditTrendChart } from "@/components/meter/credit-trend-chart";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { prisma } from "@/lib/prisma";
 import { MeterCredit } from "@prisma/client";
+import { addDays, endOfMonth, startOfMonth, subDays } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -17,6 +19,18 @@ export default async function Page({ params: { id } }: PageProps) {
   const meter = await prisma.meter.findUnique({ where: { id } });
 
   if (!meter) redirect("/");
+
+  const meterCredits = await prisma.meterCredit.findMany({
+    where: {
+      meter: { id },
+
+      recordedAt: {
+        gte: subDays(startOfMonth(new Date()), 1),
+        lte: addDays(endOfMonth(new Date()), 1),
+      },
+    },
+    orderBy: { recordedAt: "desc" },
+  });
 
   const tableData = await prisma.meterCredit
     .findMany({
@@ -88,7 +102,8 @@ export default async function Page({ params: { id } }: PageProps) {
         </Link>{" "}
         directly.
       </p>
-      <MeterBarChart data={graphData} />
+      <AverageDailyCostChart data={meterCredits} />
+      <CreditTrendChart data={meterCredits} />
       <Table className="border">
         <TableCaption>A list of your recent balance history.</TableCaption>
         <TableHeader>
