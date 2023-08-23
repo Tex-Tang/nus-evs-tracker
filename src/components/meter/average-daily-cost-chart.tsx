@@ -77,8 +77,8 @@ export function AverageDailyCostChart({ data }: AverageDailyCostChartProps) {
       <CardHeader>
         <CardTitle>Estimated Average Daily Cost</CardTitle>
         <CardDescription>
-          As credit update very few hours, we could not calculate the daily cost precisely. Therefore, the data might
-          not be accurate.
+          Credit will update every few hours so we could not calculate the daily cost accurately. Therefore, the data is
+          a reference only.
         </CardDescription>
       </CardHeader>
       <CardContent>

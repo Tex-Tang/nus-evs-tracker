@@ -32,7 +32,7 @@ export function CreditTrendChart({ data }: CreditTrendChartProps) {
     <Card>
       <CardHeader>
         <CardTitle>Credit Trend</CardTitle>
-        <CardDescription>We track your credit history and show you how your credit changes over time.</CardDescription>
+        <CardDescription>We track your credit history and show how your credit changes over time.</CardDescription>
       </CardHeader>
       <CardContent>
         <LineChart

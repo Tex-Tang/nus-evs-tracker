@@ -35,12 +35,12 @@ export default async function Page({ params: { id } }: PageProps) {
         <h1 className="text-2xl">{meter.username}</h1>
         <TopUpButton username={meter.username} />
       </div>
-      <div className="md:w-1/2 md:pr-4 flex flex-col gap-4 order-2 md:order-1">
-        <MeterCreditTable meterCredits={meterCredits} />
-      </div>
-      <div className="md:w-1/2 flex flex-col gap-4 order-1 md:order-2">
+      <div className="md:w-1/2 flex flex-col gap-4 md:pr-4">
         <AverageDailyCostChart data={meterCredits} />
         <CreditTrendChart data={meterCredits} />
+      </div>
+      <div className="md:w-1/2 flex flex-col gap-4">
+        <MeterCreditTable meterCredits={meterCredits} />
       </div>
     </div>
   );
