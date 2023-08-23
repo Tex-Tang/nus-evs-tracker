@@ -1,4 +1,6 @@
 "use client";
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MeterCredit } from "@prisma/client";
 import { LineChart } from "@tremor/react";
 import { format } from "date-fns";
@@ -9,7 +11,7 @@ export type CreditTrendChartProps = {
 };
 
 type CreditTrendSeries = {
-  recordedAt: string;
+  Date: string;
   Credit: number;
 };
 
@@ -19,7 +21,7 @@ export function CreditTrendChart({ data }: CreditTrendChartProps) {
       acc[acc.length - 1].Credit += curr.credit;
     } else {
       acc.push({
-        recordedAt: format(curr.recordedAt, "dd MMM"),
+        Date: format(curr.recordedAt, "dd MMM"),
         Credit: curr.credit,
       });
     }
@@ -27,14 +29,22 @@ export function CreditTrendChart({ data }: CreditTrendChartProps) {
   }, []);
 
   return (
-    <LineChart
-      className="mt-6"
-      data={chartData}
-      index="year"
-      categories={["Credit"]}
-      colors={["blue"]}
-      valueFormatter={(value) => `S$${value.toFixed(2)}`}
-      yAxisWidth={64}
-    />
+    <Card>
+      <CardHeader>
+        <CardTitle>Credit Trend</CardTitle>
+        <CardDescription>We track your credit history and show you how your credit changes over time.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <LineChart
+          data={chartData}
+          index="Date"
+          categories={["Credit"]}
+          colors={["blue"]}
+          className="h-64"
+          valueFormatter={(value) => `S$${value.toFixed(2)}`}
+          yAxisWidth={64}
+        />
+      </CardContent>
+    </Card>
   );
 }

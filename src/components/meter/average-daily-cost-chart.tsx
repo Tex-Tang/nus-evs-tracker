@@ -1,8 +1,11 @@
+"use client";
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MeterCredit } from "@prisma/client";
+import { BarChart } from "@tremor/react";
 import { addDays, differenceInHours, startOfDay, subDays } from "date-fns";
 import { formatInTimeZone, utcToZonedTime } from "date-fns-tz";
 import { cloneDeep, reverse } from "lodash";
-import { CostChart } from "./cost-chart";
 
 type AverageDailyCostChartProps = {
   data: MeterCredit[];
@@ -65,9 +68,30 @@ function listAverageDailyCost(meterCredits: MeterCredit[]) {
 
 export function AverageDailyCostChart({ data }: AverageDailyCostChartProps) {
   const averageDailyCost = listAverageDailyCost(data).map((d) => ({
-    Date: formatInTimeZone(d.date, "Asia/Singapore", "dd MMM yyyy"),
+    Date: formatInTimeZone(d.date, "Asia/Singapore", "dd MMM"),
     "Average Daily Cost": d.cost,
   }));
 
-  return <CostChart data={averageDailyCost} />;
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Estimated Average Daily Cost</CardTitle>
+        <CardDescription>
+          As credit update very few hours, we could not calculate the daily cost precisely. Therefore, the data might
+          not be accurate.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <BarChart
+          data={averageDailyCost}
+          index="Date"
+          categories={["Average Daily Cost"]}
+          colors={["blue"]}
+          yAxisWidth={48}
+          className="h-64"
+          valueFormatter={(value) => `S$${value.toFixed(2)}`}
+        />
+      </CardContent>
+    </Card>
+  );
 }
