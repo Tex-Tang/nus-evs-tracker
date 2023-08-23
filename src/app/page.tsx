@@ -8,7 +8,7 @@ import { FaGithub } from "react-icons/fa";
 
 export default function Home() {
   return (
-    <main className="max-w-2xl mx-auto flex flex-col my-4 gap-y-4 sm:gap-y-8">
+    <main className="max-w-2xl mx-auto flex flex-col my-4 gap-y-4 sm:gap-y-8 sm:my-8 md:my-16">
       <Brand />
       <Alert>
         <AlertDescription>
