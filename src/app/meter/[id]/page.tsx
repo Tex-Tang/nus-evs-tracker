@@ -3,7 +3,7 @@ import { CreditTrendChart } from "@/components/meter/credit-trend-chart";
 import { MeterCreditTable } from "@/components/meter/meter-credit-table";
 import { TopUpButton } from "@/components/meter/top-up-button";
 import { prisma } from "@/lib/prisma";
-import { addDays, endOfMonth, startOfMonth, subDays } from "date-fns";
+import { subDays } from "date-fns";
 import { redirect } from "next/navigation";
 
 type PageProps = {
@@ -22,8 +22,8 @@ export default async function Page({ params: { id } }: PageProps) {
       meter: { id },
 
       recordedAt: {
-        gte: subDays(startOfMonth(new Date()), 1),
-        lte: addDays(endOfMonth(new Date()), 1),
+        gte: subDays(new Date(), 30),
+        lte: new Date(),
       },
     },
     orderBy: { recordedAt: "desc" },
